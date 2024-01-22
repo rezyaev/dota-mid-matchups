@@ -1,8 +1,7 @@
 import { random } from "lodash-es";
-import "./App.css";
-import { CDN_URL, HEROES } from "./config";
+import { HEROES, CDN_URL } from "../config";
 
-export default function App() {
+export function Game() {
 	const hero1 = HEROES[random(0, HEROES.length)];
 
 	let hero2;

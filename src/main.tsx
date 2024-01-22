@@ -1,9 +1,18 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import App from "./App.tsx";
+import { RouterProvider, createBrowserRouter } from "react-router-dom";
+import { Game } from "./views/game";
+import "./main.css";
+
+const router = createBrowserRouter([
+	{
+		path: "/game",
+		element: <Game />,
+	},
+]);
 
 ReactDOM.createRoot(document.body).render(
 	<React.StrictMode>
-		<App />
+		<RouterProvider router={router} />
 	</React.StrictMode>
 );
