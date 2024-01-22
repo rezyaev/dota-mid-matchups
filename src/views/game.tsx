@@ -10,9 +10,9 @@ export function Game() {
 	} while (hero1 === hero2);
 
 	return (
-		<main className="bg-gray-900 text-gray-300  relative h-full flex items-center flex-col gap-4 p-4">
-			<HeroCard hero={hero1} />
-			<HeroCard hero={hero2} />
+		<main className="relative h-full flex items-center flex-col gap-4 p-4">
+			<HeroCard hero={hero1.displayName} />
+			<HeroCard hero={hero2.displayName} />
 		</main>
 	);
 }
