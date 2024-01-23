@@ -11,7 +11,9 @@ const STATS_QUERY = `
         heroId1
         lossCount
         matchCount
+				winCount
         stompWinCount
+        stompLossCount
       }
     }
   }
@@ -21,7 +23,9 @@ type LaneOutcome = {
 	heroId1: number;
 	lossCount: number;
 	matchCount: number;
+	winCount: number;
 	stompWinCount: number;
+	stompLossCount: number;
 };
 
 export function Stats() {
@@ -43,9 +47,12 @@ export function Stats() {
 				for (const outcome of laneOutcomes) {
 					const idx = stats.findIndex((o) => o.heroId1 === outcome.heroId1);
 					if (idx !== -1) {
-						stats[idx].lossCount += outcome.lossCount;
-						stats[idx].matchCount += outcome.matchCount;
-						stats[idx].stompWinCount += outcome.stompWinCount;
+						for (const key in stats[idx]) {
+							const field = key as keyof LaneOutcome;
+							if (field === "heroId1") continue;
+
+							stats[idx][field] += outcome[field];
+						}
 					} else {
 						stats.push(outcome);
 					}
@@ -68,31 +75,67 @@ export function Stats() {
 						<tr>
 							<th className="border-gray-700 border p-3 text-sm text-gray-400"></th>
 							<th className="border-gray-700 border p-3 text-sm text-gray-400">Hero</th>
+							<th className="border-gray-700 border p-3 text-sm text-gray-400">Got stomped %</th>
+							<th className="border-gray-700 border p-3 text-sm text-gray-400">Lost %</th>
+							<th className="border-gray-700 border p-3 text-sm text-gray-400">Won %</th>
 							<th className="border-gray-700 border p-3 text-sm text-gray-400">Stomped %</th>
 							<th className="border-gray-700 border p-3 text-sm text-gray-400">Matches</th>
+							<th className="border-gray-700 border p-3 text-sm text-gray-400">Rating</th>
 						</tr>
 					</thead>
 
 					<tbody className="text-base">
 						{stats
 							.filter((s) => s.matchCount > 20000)
-							.map((s) => ({
-								...s,
-								name: HEROES.find((h) => h.id === s.heroId1)!.displayName,
-								winPercent: Math.round((s.stompWinCount / s.matchCount) * 100),
-							}))
-							.sort((s1, s2) => s2.winPercent - s1.winPercent)
-							.map((s, idx) => (
-								<tr key={s.name}>
-									<td className="border-gray-700 border p-3 text-sm text-gray-400 text-center">{idx + 1}</td>
-									<th className="border-gray-700 border p-3 text-left">{s.name}</th>
-									<td className="border-gray-700 border p-3 text-right">{s.winPercent}%</td>
-									<td className="border-gray-700 border p-3 text-right">{s.matchCount}</td>
-								</tr>
-							))}
+							.sort((s1, s2) => calculateLaneRating(s2) - calculateLaneRating(s1))
+							.map((s, idx) => {
+								const name = HEROES.find((h) => h.id === s.heroId1)!.displayName;
+								return (
+									<tr key={name}>
+										<td className="border-gray-700 border p-3 text-sm text-gray-400 text-center">{idx + 1}</td>
+										<th className="border-gray-700 border p-3 text-left">{name}</th>
+										<td className="border-gray-700 border p-3 text-right">
+											{Math.round((s.stompLossCount / s.matchCount) * 100)}%
+										</td>
+										<td className="border-gray-700 border p-3 text-right">
+											{Math.round((s.lossCount / s.matchCount) * 100)}%
+										</td>
+										<td className="border-gray-700 border p-3 text-right">
+											{Math.round((s.winCount / s.matchCount) * 100)}%
+										</td>
+										<td className="border-gray-700 border p-3 text-right">
+											{Math.round((s.stompWinCount / s.matchCount) * 100)}%
+										</td>
+										<td className="border-gray-700 border p-3 text-right">{s.matchCount}</td>
+										<td className="border-gray-700 border p-3 text-right font-bold">{calculateLaneRating(s)}</td>
+									</tr>
+								);
+							})}
 					</tbody>
 				</table>
 			</div>
 		</main>
 	);
 }
+
+/**
+ * Great - stomps
+ * Good - wins
+ *
+ * Bad - losses
+ *
+ * With match count considered
+ */
+function calculateLaneRating({ lossCount, matchCount, winCount, stompWinCount, stompLossCount }: LaneOutcome): number {
+	return Math.round(
+		((stompWinCount * 4 + winCount - lossCount - stompLossCount * 4) / matchCount) * Math.log(matchCount) * 100
+	);
+}
+
+/**
+ * Tiers based by this rating:
+ *
+ * S - Huskar, Lone Druid, Viper
+ * A - Dragon Knight, Outworld Destroyer, Arc Warden, Snapfire
+ * B - Shadow Fiend, Lina, Timbersaw, Sniper
+ */
