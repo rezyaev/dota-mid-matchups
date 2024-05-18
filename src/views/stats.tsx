@@ -1,65 +1,13 @@
 import { useEffect, useState } from "react";
 import { HEROES } from "../config";
-
-const TOKEN =
-	"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJTdWJqZWN0IjoiOGI0NDQyMWMtNDQwNy00YjlkLTllNGItNmExNzE2NzA4Y2EwIiwiU3RlYW1JZCI6IjEzNzM0MjE3OSIsIm5iZiI6MTcwMDcwMjQ0MywiZXhwIjoxNzMyMjM4NDQzLCJpYXQiOjE3MDA3MDI0NDMsImlzcyI6Imh0dHBzOi8vYXBpLnN0cmF0ei5jb20ifQ.zK1k2iTqZavSf02DiY0cQFWF6_ZgcF9-lfz8erPIdYA";
-const API_URL = "https://api.stratz.com/graphql";
-const STATS_QUERY = `
-{
-    heroStats { 
-      laneOutcome(isWith: false, positionIds: [POSITION_2]) {
-        heroId1
-        lossCount
-        matchCount
-		winCount
-        stompWinCount
-        stompLossCount
-      }
-    }
-  }
-`;
-
-type LaneOutcome = {
-	heroId1: number;
-	lossCount: number;
-	matchCount: number;
-	winCount: number;
-	stompWinCount: number;
-	stompLossCount: number;
-};
+import { LaneOutcome, fetchLaneOutcomes } from "../api";
 
 export function Stats() {
 	const [stats, setStats] = useState<LaneOutcome[]>([]);
 
 	useEffect(() => {
-		fetch(API_URL, {
-			method: "POST",
-			body: JSON.stringify({ query: STATS_QUERY }),
-			headers: {
-				Authorization: `Bearer ${TOKEN}`,
-				"Content-Type": "application/json",
-			},
-		})
-			.then((resp) => resp.json())
-			.then((resp) => resp.data.heroStats.laneOutcome as LaneOutcome[])
-			.then((laneOutcomes) => {
-				let stats: LaneOutcome[] = [];
-				for (const outcome of laneOutcomes) {
-					const idx = stats.findIndex((o) => o.heroId1 === outcome.heroId1);
-					if (idx !== -1) {
-						for (const key in stats[idx]) {
-							const field = key as keyof LaneOutcome;
-							if (field === "heroId1") continue;
-
-							stats[idx][field] += outcome[field];
-						}
-					} else {
-						stats.push(outcome);
-					}
-				}
-
-				setStats(stats);
-			})
+		fetchLaneOutcomes()
+			.then((stats) => setStats(stats))
 			.catch((err) => console.error(err));
 	}, []);
 
@@ -131,11 +79,3 @@ function calculateLaneRating({ lossCount, matchCount, winCount, stompWinCount, s
 		((stompWinCount * 4 + winCount - lossCount - stompLossCount * 4) / matchCount) * Math.log(matchCount) * 100
 	);
 }
-
-/**
- * Tiers based by this rating:
- *
- * S - Huskar, Lone Druid, Viper
- * A - Dragon Knight, Outworld Destroyer, Arc Warden, Snapfire
- * B - Shadow Fiend, Lina, Timbersaw, Sniper
- */
