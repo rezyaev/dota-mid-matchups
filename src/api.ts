@@ -6,8 +6,10 @@ const STATS_QUERY = `
     heroStats { 
       laneOutcome(isWith: false, positionIds: [POSITION_2]) {
         heroId1
-        lossCount
+        heroId2
         matchCount
+        lossCount
+        drawCount
 		winCount
         stompWinCount
         stompLossCount
@@ -19,8 +21,9 @@ const STATS_QUERY = `
 export type LaneOutcome = {
 	heroId1: number;
 	heroId2: number;
-	lossCount: number;
 	matchCount: number;
+	lossCount: number;
+	drawCount: number;
 	winCount: number;
 	stompWinCount: number;
 	stompLossCount: number;

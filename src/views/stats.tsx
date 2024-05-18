@@ -16,17 +16,18 @@ export function Stats() {
 	}
 
 	return (
-		<main className="p-4">
+		<main className="p-2 md:p-4">
 			<div className="border-gray-700 border rounded overflow-hidden bg-gray-800 max-w-5xl mx-auto">
 				<table className="w-full rounded">
 					<thead>
 						<tr>
-							<th className="border-gray-700 border p-3 text-sm text-gray-400"></th>
+							<th className="hidden md:table-cell border-gray-700 border p-3 text-sm text-gray-400"></th>
 							<th className="border-gray-700 border p-3 text-sm text-gray-400">Hero</th>
-							<th className="border-gray-700 border p-3 text-sm text-gray-400">Got stomped %</th>
-							<th className="border-gray-700 border p-3 text-sm text-gray-400">Lost %</th>
-							<th className="border-gray-700 border p-3 text-sm text-gray-400">Won %</th>
-							<th className="border-gray-700 border p-3 text-sm text-gray-400">Stomped %</th>
+							<th className="hidden sm:table-cell border-gray-700 border p-3 text-sm text-red-500">LL</th>
+							<th className="hidden sm:table-cell border-gray-700 border p-3 text-sm text-red-500">L</th>
+							<th className="hidden sm:table-cell border-gray-700 border p-3 text-sm text-yellow-500">D</th>
+							<th className="hidden sm:table-cell border-gray-700 border p-3 text-sm text-green-500">W</th>
+							<th className="hidden sm:table-cell border-gray-700 border p-3 text-sm text-green-500">WW</th>
 							<th className="border-gray-700 border p-3 text-sm text-gray-400">Matches</th>
 							<th className="border-gray-700 border p-3 text-sm text-gray-400">Rating</th>
 						</tr>
@@ -40,18 +41,23 @@ export function Stats() {
 								const name = HEROES.find((h) => h.id === s.heroId1)!.displayName;
 								return (
 									<tr key={name}>
-										<td className="border-gray-700 border p-3 text-sm text-gray-400 text-center">{idx + 1}</td>
-										<th className="border-gray-700 border p-3 text-left">{name}</th>
-										<td className="border-gray-700 border p-3 text-right">
+										<td className="hidden md:table-cell border-gray-700 border p-3 text-sm text-gray-400 text-center">
+											{idx + 1}
+										</td>
+										<th className="border-gray-700 border p-3 text-left font-normal">{name}</th>
+										<td className="hidden sm:table-cell border-gray-700 border p-3 text-right">
 											{Math.round((s.stompLossCount / s.matchCount) * 100)}%
 										</td>
-										<td className="border-gray-700 border p-3 text-right">
+										<td className="hidden sm:table-cell border-gray-700 border p-3 text-right">
 											{Math.round((s.lossCount / s.matchCount) * 100)}%
 										</td>
-										<td className="border-gray-700 border p-3 text-right">
+										<td className="hidden sm:table-cell border-gray-700 border p-3 text-right">
+											{Math.round((s.drawCount / s.matchCount) * 100)}%
+										</td>
+										<td className="hidden sm:table-cell border-gray-700 border p-3 text-right">
 											{Math.round((s.winCount / s.matchCount) * 100)}%
 										</td>
-										<td className="border-gray-700 border p-3 text-right">
+										<td className="hidden sm:table-cell border-gray-700 border p-3 text-right">
 											{Math.round((s.stompWinCount / s.matchCount) * 100)}%
 										</td>
 										<td className="border-gray-700 border p-3 text-right">{s.matchCount}</td>
