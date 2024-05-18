@@ -7,9 +7,9 @@ export function Stats() {
 
 	if (isPending) {
 		return (
-			<main className="w-full h-full flex items-center justify-center">
+			<main className="flex h-full w-full items-center justify-center">
 				<svg
-					className="animate-spin h-16 w-16 text-gray-300"
+					className="h-16 w-16 animate-spin text-gray-300"
 					xmlns="http://www.w3.org/2000/svg"
 					fill="none"
 					viewBox="0 0 24 24"
@@ -27,27 +27,27 @@ export function Stats() {
 
 	if (isError) {
 		return (
-			<main className="w-full h-full flex items-center justify-center">
-				<code className="w-12 h-12">{error.message}</code>
+			<main className="flex h-full w-full items-center justify-center">
+				<code>{error.message}</code>
 			</main>
 		);
 	}
 
 	return (
 		<main className="p-2 md:p-4">
-			<div className="border-gray-700 border rounded overflow-hidden bg-gray-800 max-w-5xl mx-auto">
+			<div className="mx-auto max-w-5xl overflow-hidden rounded border border-gray-700 bg-gray-800">
 				<table className="w-full rounded">
 					<thead>
 						<tr>
-							<th className="hidden md:table-cell border-gray-700 border p-3 text-sm text-gray-400"></th>
-							<th className="border-gray-700 border p-3 text-sm text-gray-400">Hero</th>
-							<th className="hidden sm:table-cell border-gray-700 border p-3 text-sm text-red-500">LL</th>
-							<th className="hidden sm:table-cell border-gray-700 border p-3 text-sm text-red-500">L</th>
-							<th className="hidden sm:table-cell border-gray-700 border p-3 text-sm text-yellow-500">D</th>
-							<th className="hidden sm:table-cell border-gray-700 border p-3 text-sm text-green-500">W</th>
-							<th className="hidden sm:table-cell border-gray-700 border p-3 text-sm text-green-500">WW</th>
-							<th className="border-gray-700 border p-3 text-sm text-gray-400">Matches</th>
-							<th className="border-gray-700 border p-3 text-sm text-gray-400">Rating</th>
+							<th className="hidden border border-gray-700 p-3 text-sm text-gray-400 md:table-cell"></th>
+							<th className="border border-gray-700 p-3 text-sm text-gray-400">Hero</th>
+							<th className="hidden border border-gray-700 p-3 text-sm text-red-500 sm:table-cell">LL</th>
+							<th className="hidden border border-gray-700 p-3 text-sm text-red-500 sm:table-cell">L</th>
+							<th className="hidden border border-gray-700 p-3 text-sm text-yellow-500 sm:table-cell">D</th>
+							<th className="hidden border border-gray-700 p-3 text-sm text-green-500 sm:table-cell">W</th>
+							<th className="hidden border border-gray-700 p-3 text-sm text-green-500 sm:table-cell">WW</th>
+							<th className="border border-gray-700 p-3 text-sm text-gray-400">Matches</th>
+							<th className="border border-gray-700 p-3 text-sm text-gray-400">Rating</th>
 						</tr>
 					</thead>
 
@@ -59,27 +59,27 @@ export function Stats() {
 								const name = HEROES.find((h) => h.id === s.heroId1)!.displayName;
 								return (
 									<tr key={name}>
-										<td className="hidden md:table-cell border-gray-700 border p-3 text-sm text-gray-400 text-center">
+										<td className="hidden border border-gray-700 p-3 text-center text-sm text-gray-400 md:table-cell">
 											{idx + 1}
 										</td>
-										<th className="border-gray-700 border p-3 text-left font-normal">{name}</th>
-										<td className="hidden sm:table-cell border-gray-700 border p-3 text-right">
+										<th className="border border-gray-700 p-3 text-left font-normal">{name}</th>
+										<td className="hidden border border-gray-700 p-3 text-right sm:table-cell">
 											{Math.round((s.stompLossCount / s.matchCount) * 100)}%
 										</td>
-										<td className="hidden sm:table-cell border-gray-700 border p-3 text-right">
+										<td className="hidden border border-gray-700 p-3 text-right sm:table-cell">
 											{Math.round((s.lossCount / s.matchCount) * 100)}%
 										</td>
-										<td className="hidden sm:table-cell border-gray-700 border p-3 text-right">
+										<td className="hidden border border-gray-700 p-3 text-right sm:table-cell">
 											{Math.round((s.drawCount / s.matchCount) * 100)}%
 										</td>
-										<td className="hidden sm:table-cell border-gray-700 border p-3 text-right">
+										<td className="hidden border border-gray-700 p-3 text-right sm:table-cell">
 											{Math.round((s.winCount / s.matchCount) * 100)}%
 										</td>
-										<td className="hidden sm:table-cell border-gray-700 border p-3 text-right">
+										<td className="hidden border border-gray-700 p-3 text-right sm:table-cell">
 											{Math.round((s.stompWinCount / s.matchCount) * 100)}%
 										</td>
-										<td className="border-gray-700 border p-3 text-right">{s.matchCount}</td>
-										<td className="border-gray-700 border p-3 text-right font-bold">{calculateLaneRating(s)}</td>
+										<td className="border border-gray-700 p-3 text-right">{s.matchCount}</td>
+										<td className="border border-gray-700 p-3 text-right font-bold">{calculateLaneRating(s)}</td>
 									</tr>
 								);
 							})}
@@ -100,6 +100,6 @@ export function Stats() {
  */
 function calculateLaneRating({ lossCount, matchCount, winCount, stompWinCount, stompLossCount }: LaneOutcome): number {
 	return Math.round(
-		((stompWinCount * 4 + winCount - lossCount - stompLossCount * 4) / matchCount) * Math.log(matchCount) * 100
+		((stompWinCount * 4 + winCount - lossCount - stompLossCount * 4) / matchCount) * Math.log(matchCount) * 100,
 	);
 }

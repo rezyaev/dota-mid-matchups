@@ -23,5 +23,5 @@ ReactDOM.createRoot(document.body).render(
 		<QueryClientProvider client={queryClient}>
 			<RouterProvider router={router} />
 		</QueryClientProvider>
-	</React.StrictMode>
+	</React.StrictMode>,
 );
