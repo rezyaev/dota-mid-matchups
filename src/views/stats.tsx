@@ -11,7 +11,7 @@ const STATS_QUERY = `
         heroId1
         lossCount
         matchCount
-				winCount
+		winCount
         stompWinCount
         stompLossCount
       }
@@ -69,7 +69,7 @@ export function Stats() {
 
 	return (
 		<main className="p-4">
-			<div className="border-gray-700 border rounded overflow-hidden bg-gray-800">
+			<div className="border-gray-700 border rounded overflow-hidden bg-gray-800 max-w-5xl mx-auto">
 				<table className="w-full rounded">
 					<thead>
 						<tr>
