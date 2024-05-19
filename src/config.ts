@@ -1,6 +1,11 @@
 export const CDN_URL = "https://cdn.cloudflare.steamstatic.com/apps/dota2/videos/dota_react/heroes/renders";
 
-export const HEROES = [
+export type Hero = {
+	id: number;
+	displayName: string;
+};
+
+export const HEROES: Hero[] = [
 	{
 		id: 1,
 		displayName: "Anti-Mage",

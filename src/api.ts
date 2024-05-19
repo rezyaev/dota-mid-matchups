@@ -1,22 +1,7 @@
 const TOKEN =
 	"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJTdWJqZWN0IjoiOGI0NDQyMWMtNDQwNy00YjlkLTllNGItNmExNzE2NzA4Y2EwIiwiU3RlYW1JZCI6IjEzNzM0MjE3OSIsIm5iZiI6MTcwMDcwMjQ0MywiZXhwIjoxNzMyMjM4NDQzLCJpYXQiOjE3MDA3MDI0NDMsImlzcyI6Imh0dHBzOi8vYXBpLnN0cmF0ei5jb20ifQ.zK1k2iTqZavSf02DiY0cQFWF6_ZgcF9-lfz8erPIdYA";
 const API_URL = "https://api.stratz.com/graphql";
-const STATS_QUERY = `
-{
-    heroStats { 
-      laneOutcome(isWith: false, positionIds: [POSITION_2]) {
-        heroId1
-        heroId2
-        matchCount
-        lossCount
-        drawCount
-		winCount
-        stompWinCount
-        stompLossCount
-      }
-    }
-  }
-`;
+const HEADERS = { Authorization: `Bearer ${TOKEN}`, "Content-Type": "application/json" };
 
 export type LaneOutcome = {
 	heroId1: number;
@@ -29,14 +14,55 @@ export type LaneOutcome = {
 	stompLossCount: number;
 };
 
+export async function fetchLaneOutcomesByHeroId(heroId: number) {
+	const resp = await fetch(API_URL, {
+		method: "POST",
+		body: JSON.stringify({
+			query: `
+			{
+				heroStats { 
+					laneOutcome(isWith: false, positionIds: [POSITION_2], heroId: ${heroId}) {
+						heroId1
+						heroId2
+						matchCount
+						lossCount
+						drawCount
+						winCount
+						stompWinCount
+						stompLossCount
+					}
+				}
+			}
+		`,
+		}),
+		headers: HEADERS,
+	}).then((r) => r.json());
+
+	return resp.data.heroStats.laneOutcome as LaneOutcome[];
+}
+
 export async function fetchLaneOutcomes() {
 	const resp = await fetch(API_URL, {
 		method: "POST",
-		body: JSON.stringify({ query: STATS_QUERY }),
-		headers: {
-			Authorization: `Bearer ${TOKEN}`,
-			"Content-Type": "application/json",
-		},
+		body: JSON.stringify({
+			query: `
+			{
+				heroStats { 
+					laneOutcome(isWith: false, positionIds: [POSITION_2]) {
+						heroId1
+						heroId2
+						matchCount
+						lossCount
+						drawCount
+						winCount
+						stompWinCount
+						stompLossCount
+					}
+				}
+			}
+		`,
+		}),
+		headers: HEADERS,
 	}).then((r) => r.json());
 
 	const laneOutcomes = resp.data.heroStats.laneOutcome as LaneOutcome[];
