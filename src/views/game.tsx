@@ -18,7 +18,7 @@ export function Game() {
 		queryFn: async () => {
 			const hero1 = HEROES[random(0, HEROES.length)];
 
-			let hero2;
+			let hero2: Hero;
 			do {
 				hero2 = HEROES[random(0, HEROES.length)];
 			} while (hero1 === hero2);
