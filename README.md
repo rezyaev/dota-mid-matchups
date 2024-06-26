@@ -31,5 +31,5 @@ export default {
 
 ## To-do list
 
-- [ ] Add filter by match count
+- [x] Add filter by match count
 
