@@ -14,15 +14,14 @@ export function Stats() {
         <main className="mx-auto flex max-w-5xl flex-col p-2 md:p-8">
             <h1 className="mb-8 text-center text-5xl font-bold">Midlane Statistics</h1>
 
-            <div className="mb-4 flex flex-col gap-2">
-                <label htmlFor="match-count">Match count</label>
+            <div className="mb-4 flex flex-col gap-1">
+                <label htmlFor="match-count" className="text-gray-400 text-sm">Match count</label>
                 <input
-                    type="number"
+                    inputMode="numeric"
                     id="match-count"
-                    className="w-24 appearance-none rounded border border-gray-700 bg-gray-800 p-2"
+                    className="w-24 appearance-none rounded border border-gray-700 bg-gray-800 p-2 outline-blue-700 focus:outline outline-2 outline-offset-2"
                     min="0"
                     max={Number.MAX_SAFE_INTEGER}
-                    step="1"
                     value={matchCount}
                     onChange={(event) => setMatchCount(event.target.value)}
                 />
