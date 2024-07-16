@@ -70,7 +70,7 @@ export async function fetchLaneOutcomes() {
 }
 
 function mergeLaneOutcomes(outcomes: LaneOutcome[]) {
-	let mergedOutcomes: LaneOutcome[] = [];
+	const mergedOutcomes: LaneOutcome[] = [];
 
 	for (const outcome of outcomes) {
 		const idx = mergedOutcomes.findIndex((o) => o.heroId1 === outcome.heroId1);
@@ -89,4 +89,34 @@ function mergeLaneOutcomes(outcomes: LaneOutcome[]) {
 	}
 
 	return mergedOutcomes;
+}
+
+export type WinDay = {
+    day: number;
+    heroId: number;
+    winCount: number;
+    matchCount: number
+}
+
+export async function fetchWinDays(): Promise<WinDay[]> {
+	const resp = await fetch(API_URL, {
+		method: "POST",
+		body: JSON.stringify({
+			query: `
+			{
+		        heroStats {
+                    winDay(positionIds: [POSITION_2]) {
+                        day
+                        heroId
+                        winCount
+                        matchCount
+                    }
+                }	
+			}
+		`,
+		}),
+		headers: HEADERS,
+	}).then((r) => r.json());
+
+    return resp.data.heroStats.winDay as WinDay[];
 }

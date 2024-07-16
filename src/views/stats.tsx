@@ -1,5 +1,5 @@
 import { HEROES } from "../config";
-import { LaneOutcome, fetchLaneOutcomes } from "../api";
+import { LaneOutcome, fetchLaneOutcomes, fetchWinDays } from "../api";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Suspense } from "react";
 import { useLocalStorage } from "../lib/use-local-storage";
@@ -35,34 +35,42 @@ export function Stats() {
 }
 
 function Table({ matchCount }: { matchCount: number }) {
-    const { data: stats } = useSuspenseQuery({ queryKey: ["stats"], queryFn: fetchLaneOutcomes });
+    const { data } = useSuspenseQuery({ queryKey: ["stats"], queryFn: () => Promise.all([fetchLaneOutcomes(), fetchWinDays()]) });
+    const [laneOutcomes, winDays] = data;
 
     return (
         <div className="overflow-hidden rounded border border-gray-700 bg-gray-800">
-            <table className="w-full">
+            <table className="w-full text-sm">
                 <thead>
-                    <tr>
-                        <th className="hidden border border-gray-700 p-3 text-sm text-gray-400 md:table-cell"></th>
-                        <th className="border border-gray-700 p-3 text-sm text-gray-400">Hero</th>
-                        <th className="hidden border border-gray-700 p-3 text-sm text-red-500 sm:table-cell">LL</th>
-                        <th className="hidden border border-gray-700 p-3 text-sm text-red-500 sm:table-cell">L</th>
-                        <th className="hidden border border-gray-700 p-3 text-sm text-yellow-500 sm:table-cell">D</th>
-                        <th className="hidden border border-gray-700 p-3 text-sm text-green-500 sm:table-cell">W</th>
-                        <th className="hidden border border-gray-700 p-3 text-sm text-green-500 sm:table-cell">WW</th>
-                        <th className="border border-gray-700 p-3 text-sm text-gray-400">Matches</th>
-                        <th className="border border-gray-700 p-3 text-sm text-gray-400">Rating</th>
+                    <tr className="text-gray-400">
+                        <th className="hidden border border-gray-700 p-3 md:table-cell"></th>
+                        <th className="border border-gray-700 p-3 text-sm">Hero</th>
+                        <th className="hidden border border-gray-700 p-3 text-red-500 sm:table-cell">LL</th>
+                        <th className="hidden border border-gray-700 p-3 text-red-500 sm:table-cell">L</th>
+                        <th className="hidden border border-gray-700 p-3 text-yellow-500 sm:table-cell">D</th>
+                        <th className="hidden border border-gray-700 p-3 text-green-500 sm:table-cell">W</th>
+                        <th className="hidden border border-gray-700 p-3 text-green-500 sm:table-cell">WW</th>
+                        <th className="hidden border border-gray-700 p-3 sm:table-cell">MW</th>
+                        <th className="border border-gray-700 p-3 text-sm">Matches</th>
+                        <th className="border border-gray-700 p-3 text-sm">Rating</th>
                     </tr>
                 </thead>
 
                 <tbody className="text-base">
-                    {stats
+                    {laneOutcomes
                         .filter((s) => s.matchCount > matchCount)
-                        .sort((s1, s2) => calculateLaneRating(s2) - calculateLaneRating(s1))
+                        .sort((s1, s2) => calculateRating(s2) - calculateRating(s1))
                         .map((s, idx) => {
                             const name = HEROES.find((h) => h.id === s.heroId1)!.displayName;
+
+                            const winDay = winDays.find(d => d.heroId === s.heroId1);
+                            if (!winDay) {
+                                throw new Error(`winDay is not found for ${name}`)
+                            }
+
                             return (
                                 <tr key={name}>
-                                    <td className="hidden border border-gray-700 p-3 text-center text-sm text-gray-400 md:table-cell">
+                                    <td className="hidden border border-gray-700 p-3 text-center text-gray-400 md:table-cell">
                                         {idx + 1}
                                     </td>
                                     <th className="border border-gray-700 p-3 text-left font-normal">{name}</th>
@@ -81,14 +89,32 @@ function Table({ matchCount }: { matchCount: number }) {
                                     <td className="hidden border border-gray-700 p-3 text-right sm:table-cell">
                                         {Math.round((s.stompWinCount / s.matchCount) * 100)}%
                                     </td>
+                                    <td className="hidden border border-gray-700 p-3 text-right sm:table-cell">
+                                        {Math.round((winDay.winCount / winDay.matchCount) * 100)}%
+                                    </td>
                                     <td className="border border-gray-700 p-3 text-right">{s.matchCount}</td>
-                                    <td className="border border-gray-700 p-3 text-right font-bold">{calculateLaneRating(s)}</td>
+                                    <td className="border border-gray-700 p-3 text-right font-bold">{calculateRating(s)}</td>
                                 </tr>
                             );
                         })}
                 </tbody>
             </table>
         </div>
+    );
+}
+
+/**
+ * Great - stomps
+ * Great - stomps
+ * Good - wins
+ *
+ * Bad - losses
+ *
+ * With match count considered
+ */
+function calculateRating({ lossCount, matchCount, winCount, stompWinCount, stompLossCount }: LaneOutcome): number {
+    return Math.round(
+        ((stompWinCount * 4 + winCount - lossCount - stompLossCount * 4) / matchCount) * Math.log(matchCount) * 100,
     );
 }
 
@@ -111,16 +137,4 @@ function Spinner() {
         </div>
     );
 }
-/**
- * Great - stomps
- * Good - wins
- *
- * Bad - losses
- *
- * With match count considered
- */
-function calculateLaneRating({ lossCount, matchCount, winCount, stompWinCount, stompLossCount }: LaneOutcome): number {
-    return Math.round(
-        ((stompWinCount * 4 + winCount - lossCount - stompLossCount * 4) / matchCount) * Math.log(matchCount) * 100,
-    );
-}
+
