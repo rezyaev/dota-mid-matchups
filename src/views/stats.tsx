@@ -1,21 +1,14 @@
 import { HEROES } from "../config";
 import { LaneOutcome, fetchLaneOutcomes } from "../api";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import React, { Suspense, useState } from "react";
+import { Suspense } from "react";
+import { useLocalStorage } from "../lib/use-local-storage";
 
 const MATCH_COUNT_KEY = 'MATCH_COUNT_KEY'
+const MATCH_COUNT_DEFAULT_VALUE = '20000'
 
 export function Stats() {
-    const [matchCount, setMatchCount] = useState(() => {
-        const storageValue = localStorage.getItem(MATCH_COUNT_KEY)
-        return storageValue ? parseInt(storageValue) : 20000
-    })
-
-    function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
-        const value = event.target.value;
-        setMatchCount(parseInt(value));
-        localStorage.setItem(MATCH_COUNT_KEY, value);
-    }
+    const [matchCount, setMatchCount] = useLocalStorage(MATCH_COUNT_KEY, MATCH_COUNT_DEFAULT_VALUE)
 
     return (
         <main className="mx-auto flex max-w-5xl flex-col p-2 md:p-8">
@@ -31,12 +24,12 @@ export function Stats() {
                     max={Number.MAX_SAFE_INTEGER}
                     step="1"
                     value={matchCount}
-                    onChange={handleChange}
+                    onChange={(event) => setMatchCount(event.target.value)}
                 />
             </div>
 
             <Suspense fallback={<Spinner />}>
-                <Table matchCount={matchCount} />
+                <Table matchCount={parseInt(matchCount)} />
             </Suspense>
         </main>
     );
