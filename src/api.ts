@@ -1,5 +1,4 @@
-const TOKEN =
-	"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJTdWJqZWN0IjoiOGI0NDQyMWMtNDQwNy00YjlkLTllNGItNmExNzE2NzA4Y2EwIiwiU3RlYW1JZCI6IjEzNzM0MjE3OSIsIm5iZiI6MTcwMDcwMjQ0MywiZXhwIjoxNzMyMjM4NDQzLCJpYXQiOjE3MDA3MDI0NDMsImlzcyI6Imh0dHBzOi8vYXBpLnN0cmF0ei5jb20ifQ.zK1k2iTqZavSf02DiY0cQFWF6_ZgcF9-lfz8erPIdYA";
+const TOKEN = import.meta.env.VITE_STRATZ_TOKEN;
 const API_URL = "https://api.stratz.com/graphql";
 const HEADERS = { Authorization: `Bearer ${TOKEN}`, "Content-Type": "application/json" };
 
@@ -92,11 +91,11 @@ function mergeLaneOutcomes(outcomes: LaneOutcome[]) {
 }
 
 export type WinDay = {
-    day: number;
-    heroId: number;
-    winCount: number;
-    matchCount: number
-}
+	day: number;
+	heroId: number;
+	winCount: number;
+	matchCount: number;
+};
 
 export async function fetchWinDays(): Promise<WinDay[]> {
 	const resp = await fetch(API_URL, {
@@ -118,5 +117,5 @@ export async function fetchWinDays(): Promise<WinDay[]> {
 		headers: HEADERS,
 	}).then((r) => r.json());
 
-    return resp.data.heroStats.winDay as WinDay[];
+	return resp.data.heroStats.winDay as WinDay[];
 }
